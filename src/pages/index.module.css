@@ -1,0 +1,18 @@
+.container {
+    width: 100%;
+    position: relative;
+}
+
+.gameContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.earthContainer {
+    width: 70%;
+    position: relative;
+}
+
+.gameInfoContainer {
+    width: 30%;
+}
