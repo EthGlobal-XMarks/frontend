@@ -1,8 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from 'react';
-// import Modal from './Modal';
 import useWindowDimensions from '@/hooks/useWindowDimensions';
-// import useSmartContract from "./XMarksInteraction"
+
 
 
 const Globe = dynamic(() => import('react-globe.gl'), {
@@ -14,13 +13,8 @@ const Earth = ({setLongitude, setLatitude}) => {
   const [clickTimeout, setClickTimeout] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState({ lat: null, lng: null });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [customCities] = useState([
-
-    // Add more custom cities here
-  ]);
+  const [customCities] = useState([]);
   const {width, height} = useWindowDimensions();
-  // const { submitGuess } = useSmartContract();
-
   
   useEffect(() => {
     fetch('/ne_110m_populated_places_simple.geojson')
@@ -41,7 +35,8 @@ const Earth = ({setLongitude, setLatitude}) => {
       });
   }, []);
 
-  const handleLabelClick = (label, event) => {
+  // fn to handle clicks on labelled cities
+  const handleLabelClick = (label) => {
     if (clickTimeout !== null) {
       clearTimeout(clickTimeout);
       setClickTimeout(null);
@@ -52,7 +47,9 @@ const Earth = ({setLongitude, setLatitude}) => {
 
       console.log(`Double clicked on label: ${label.properties.name}`);
       console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-      setSelectedLocation({ lat: latitude, lng: longitude });
+      setLongitude(longitude);
+      setLatitude(latitude);
+      // setSelectedLocation({ lat: latitude, lng: longitude });
       setIsModalOpen(true); // Open the modal to show the details
 
     } else {
@@ -65,6 +62,7 @@ const Earth = ({setLongitude, setLatitude}) => {
     }
   };
 
+  // fn to handle clicks all over the globe
   const handleGlobeClick = (location) => {
     if (clickTimeout !== null) {
       clearTimeout(clickTimeout);
@@ -78,7 +76,7 @@ const Earth = ({setLongitude, setLatitude}) => {
      // console.log(`Double Clicked at Latitude: ${latitude}, Longitude: ${longitude}`);
       // Opening  A Dialog Box for further processes
       setLongitude(longitude);
-    setLatitude(latitude);
+      setLatitude(latitude);
       //setSelectedLocation({ lat: latitude, lng: longitude });
       setIsModalOpen(true); // Open the modal to show the details
   
@@ -94,7 +92,7 @@ const Earth = ({setLongitude, setLatitude}) => {
 
   const handleConfirmClick = async () => {
     const { lat, lng } = selectedLocation;
-    await submitGuess(lng, lat); // Note: Ensure longitude and latitude are in the correct order expected by your contract
+    await submitGuess(lng, lat); //  Ensuring longitude and latitude are in the correct order expected by your contract
     setIsModalOpen(false); // Optionally close the modal after submitting
   };
   
@@ -104,7 +102,7 @@ const Earth = ({setLongitude, setLatitude}) => {
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
         backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
         labelsData={places}
-        onLabelClick={handleLabelClick}
+        onLabelClick={(lat, lng) => handleLabelClick(lat, lng)}
         labelLat={(d) => d.properties.latitude}
         labelLng={(d) => d.properties.longitude}
         labelText={(d) => d.properties.name}
@@ -116,22 +114,6 @@ const Earth = ({setLongitude, setLatitude}) => {
         width={width*0.7}
         height={height - 65}
       />
-      {/* <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-5 rounded-lg shadow-lg text-white">
-        <h2 className="text-xl font-bold mb-2">Are you sure about your guess ?</h2>
-        <p className="text-lg">Latitude: <span className="font-semibold">{selectedLocation.lat}</span></p>
-        <p className="text-lg">Longitude: <span className="font-semibold">{selectedLocation.lng}</span></p>
-        <button onClick={() => setIsModalOpen(false)} className="mt-4 px-4 py-2 bg-purple-700 hover:bg-purple-800 rounded text-white">Close</button>
-        <button onClick={() => {
-          // onClick={handleConfirmClick}
-          console.log("Submitted")
-          setIsModalOpen(false); // closing the modal after sending
-        }} 
-        className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded text-white"> Confirm </button>
-        </div>
-      </Modal> */}
-
-
     </div>
   );
 };
